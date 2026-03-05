@@ -8,18 +8,21 @@
     <key>ProgramArguments</key>
     <array>
         <string>/bin/bash</string>
-        <string>-c</string>
-        <string>exec "$HOME/.local/bin/novel-forge-watcher"</string>
+        <string>__HOME__/.local/bin/novel-forge-watcher</string>
     </array>
 
     <key>EnvironmentVariables</key>
     <dict>
+        <key>HOME</key>
+        <string>__HOME__</string>
         <key>NF_DROPZONE</key>
-        <string>~/DropZone</string>
+        <string>__HOME__/DropZone</string>
         <key>NF_NOVELS_DIR</key>
-        <string>~/novels</string>
+        <string>__HOME__/novels</string>
         <key>NF_OPENCODE_PORT</key>
         <string>4096</string>
+        <key>PATH</key>
+        <string>__HOME__/.opencode/bin:__HOME__/.local/bin:/usr/local/bin:/usr/bin:/bin</string>
     </dict>
 
     <key>RunAtLoad</key>
@@ -32,10 +35,10 @@
     </dict>
 
     <key>StandardOutPath</key>
-    <string>~/Library/Logs/novel-forge-watcher.log</string>
+    <string>__HOME__/Library/Logs/novel-forge-watcher.log</string>
 
     <key>StandardErrorPath</key>
-    <string>~/Library/Logs/novel-forge-watcher.log</string>
+    <string>__HOME__/Library/Logs/novel-forge-watcher.log</string>
 
     <key>ThrottleInterval</key>
     <integer>5</integer>

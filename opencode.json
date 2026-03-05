@@ -1,21 +1,14 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "_comment": "This is a reference template only. setup.sh generates the real opencode.json with user-specific absolute paths in your novels directory. Do not use this file directly.",
   "mcp": {
     "graphiti-memory": {
       "type": "local",
       "command": [
-        "uv",
-        "run",
-        "--isolated",
-        "--directory",
-        "~/.local/share/mcp-servers/graphiti/mcp_server",
-        "--project",
-        ".",
-        "main.py",
-        "--transport",
-        "stdio",
-        "--group-id",
-        "novels"
+        "uv", "run", "--isolated", "--directory",
+        "/home/YOUR_USERNAME/.local/share/mcp-servers/graphiti/mcp_server",
+        "--project", ".", "main.py", "--transport", "stdio",
+        "--group-id", "novels"
       ],
       "environment": {
         "OPENAI_API_KEY": "{env:OPENAI_API_KEY}",
@@ -37,10 +30,10 @@
       "type": "local",
       "command": [
         "python3",
-        "~/.local/share/mcp-servers/ai_writers_workshop/mcp_server/server.py"
+        "/home/YOUR_USERNAME/.local/share/mcp-servers/ai_writers_workshop/mcp_server/server.py"
       ],
       "environment": {
-        "PYTHONPATH": "~/.local/share/mcp-servers/ai_writers_workshop"
+        "PYTHONPATH": "/home/YOUR_USERNAME/.local/share/mcp-servers/ai_writers_workshop"
       },
       "enabled": true
     }

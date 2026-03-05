@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # platform.sh — OS detection and tool aliases for novel-forge
 # Sourced by other scripts. Do not execute directly.
-
-set -euo pipefail
+#
+# NOTE: This file does NOT set -euo pipefail because it is sourced.
+# Callers must set their own error handling.
 
 # ─── OS Detection ───────────────────────────────────────────────────────────
 
@@ -40,11 +41,23 @@ NF_SHELL_CONFIG="$(detect_shell_config)"
 
 # ─── Tool Paths ─────────────────────────────────────────────────────────────
 
-# OpenCode binary
-NF_OPENCODE="${HOME}/.opencode/bin/opencode"
+# OpenCode binary — resolve dynamically, fall back to known location
+if command -v opencode &>/dev/null; then
+  NF_OPENCODE="$(command -v opencode)"
+elif [[ -x "${HOME}/.opencode/bin/opencode" ]]; then
+  NF_OPENCODE="${HOME}/.opencode/bin/opencode"
+else
+  NF_OPENCODE="opencode"  # Will be caught by preflight check
+fi
 
 # uv (Python package manager)
-NF_UV="${HOME}/.local/bin/uv"
+if command -v uv &>/dev/null; then
+  NF_UV="$(command -v uv)"
+elif [[ -x "${HOME}/.local/bin/uv" ]]; then
+  NF_UV="${HOME}/.local/bin/uv"
+else
+  NF_UV="uv"
+fi
 
 # pandoc
 if command -v pandoc &>/dev/null; then
@@ -179,6 +192,18 @@ log_ok() {
   echo "[novel-forge] ✓ $*"
 }
 
+# ─── Portable sed -i ────────────────────────────────────────────────────────
+# macOS sed requires -i '' (empty string arg), Linux sed uses -i with no arg.
+# Use this wrapper everywhere instead of raw `sed -i`.
+
+sed_i() {
+  if [[ "$NF_OS" == "macos" ]]; then
+    sed -i '' "$@"
+  else
+    sed -i "$@"
+  fi
+}
+
 prompt_yes_no() {
   local question="$1"
   local default="${2:-y}"
@@ -211,7 +236,8 @@ prompt_value() {
     read -r -p "[novel-forge] $question: " value
   fi
 
-  eval "$var_name='$value'"
+  # Safe variable assignment — no eval, no injection risk
+  printf -v "$var_name" '%s' "$value"
 }
 
 prompt_secret() {
@@ -221,5 +247,7 @@ prompt_secret() {
 
   read -r -s -p "[novel-forge] $question: " value
   echo  # newline after hidden input
-  eval "$var_name='$value'"
+
+  # Safe variable assignment — no eval, no injection risk
+  printf -v "$var_name" '%s' "$value"
 }

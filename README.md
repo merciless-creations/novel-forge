@@ -190,8 +190,8 @@ launchctl load ~/Library/LaunchAgents/com.novel-forge.watcher.plist
 launchctl load ~/Library/LaunchAgents/com.novel-forge.opencode.plist
 
 # View logs
-tail -f /tmp/novel-forge-watcher.log
-tail -f /tmp/novel-forge-opencode.log
+tail -f ~/Library/Logs/novel-forge-watcher.log
+tail -f ~/Library/Logs/novel-forge-opencode.log
 ```
 
 ## Supported Platforms
@@ -251,7 +251,7 @@ Check the OpenCode logs:
 # Linux
 journalctl --user -u novel-forge-opencode -f
 # macOS
-tail -f /tmp/novel-forge-opencode.log
+tail -f ~/Library/Logs/novel-forge-opencode.log
 ```
 
 ### I want to reprocess files
