@@ -1,0 +1,20 @@
+# Environment variables (API keys, secrets)
+.env
+
+# AI Writers Workshop output
+output/
+
+# Inbox (processed manuscripts — transient)
+.inbox/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+
+# Node modules (if any tools use them)
+node_modules/

@@ -1,0 +1,21 @@
+[Unit]
+Description=Novel Forge — OpenCode Web Server
+Documentation=https://github.com/merciless-creations/novel-forge
+After=network.target docker.service
+Wants=docker.service
+
+[Service]
+Type=simple
+WorkingDirectory=%h/novels
+ExecStart=%h/.opencode/bin/opencode web --port 4096
+Restart=on-failure
+RestartSec=10
+Environment=HOME=%h
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=novel-forge-opencode
+
+[Install]
+WantedBy=default.target

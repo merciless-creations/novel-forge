@@ -1,0 +1,21 @@
+[Unit]
+Description=Novel Forge — DropZone File Watcher
+Documentation=https://github.com/merciless-creations/novel-forge
+After=default.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/novel-forge-watcher
+Restart=on-failure
+RestartSec=5
+Environment=NF_DROPZONE=%h/DropZone
+Environment=NF_NOVELS_DIR=%h/novels
+Environment=NF_OPENCODE_PORT=4096
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=novel-forge-watcher
+
+[Install]
+WantedBy=default.target

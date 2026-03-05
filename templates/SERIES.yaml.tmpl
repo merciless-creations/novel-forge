@@ -1,0 +1,39 @@
+# {{SERIES_NAME}} — Series Manifest
+# This file identifies this directory as a novel series and tells
+# AI agents where to find canon, lore, and manuscript data.
+
+series:
+  name: "{{SERIES_NAME}}"
+  genre: "{{GENRE}}"
+  tone: "{{TONE}}"
+  author: "{{AUTHOR}}"
+  timeline: "{{TIMELINE}}"
+  status: "In progress"
+
+  logline: >
+    {{LOGLINE}}
+
+# Source of truth hierarchy (highest priority first):
+# 1. Manuscript files (what's written is canon)
+# 2. Master outlines (structural intent for unwritten chapters)
+# 3. Lore documents (world-building bibles)
+# 4. Canon files (characters.md, locks.yaml, timeline.md — derived from above)
+
+canon:
+  characters: "canon/characters.md"
+  locks: "canon/locks.yaml"
+  timeline: "canon/timeline.md"
+
+lore: {}
+
+# Prose style override (null = use root AI Prompt.md)
+style: null
+
+books:
+  - number: 1
+    title: "{{BOOK_TITLE}}"
+    path: "1-{{BOOK_SLUG}}"
+    timeline: "{{BOOK_TIMELINE}}"
+    status: "In progress"
+    outline: null
+    manuscript: "manuscript/"

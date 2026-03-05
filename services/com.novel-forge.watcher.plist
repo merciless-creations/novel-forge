@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.novel-forge.watcher</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>-c</string>
+        <string>exec "$HOME/.local/bin/novel-forge-watcher"</string>
+    </array>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>NF_DROPZONE</key>
+        <string>~/DropZone</string>
+        <key>NF_NOVELS_DIR</key>
+        <string>~/novels</string>
+        <key>NF_OPENCODE_PORT</key>
+        <string>4096</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>~/Library/Logs/novel-forge-watcher.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>~/Library/Logs/novel-forge-watcher.log</string>
+
+    <key>ThrottleInterval</key>
+    <integer>5</integer>
+</dict>
+</plist>

@@ -1,0 +1,24 @@
+# Canon Locks — {{SERIES_NAME}}
+# These are HARD RULES that must never be violated.
+# Any violation found during a continuity check is a BLOCKER.
+#
+# Format: Each lock has a rule, the affected entities, and the source
+# that established the lock.
+
+# Add locks as you discover facts in your manuscripts that must
+# remain consistent. Common categories:
+#
+# - ai_system_assignments (character-to-AI mappings)
+# - name_disambiguation (characters with similar names)
+# - character_ages (canonically fixed ages)
+# - cross_book_continuity (characters across multiple books)
+# - timeline_locks (era-specific constraints)
+# - front_matter_rules (valid field values)
+
+front_matter_rules:
+  - field: "series"
+    value: "{{SERIES_NAME}}"
+
+  - field: "story"
+    valid_values:
+      - "{{BOOK_TITLE}}"

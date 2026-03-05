@@ -1,0 +1,48 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "graphiti-memory": {
+      "type": "local",
+      "command": [
+        "uv",
+        "run",
+        "--isolated",
+        "--directory",
+        "~/.local/share/mcp-servers/graphiti/mcp_server",
+        "--project",
+        ".",
+        "main.py",
+        "--transport",
+        "stdio",
+        "--group-id",
+        "novels"
+      ],
+      "environment": {
+        "OPENAI_API_KEY": "{env:OPENAI_API_KEY}",
+        "FALKORDB_URI": "redis://localhost:6379"
+      },
+      "enabled": true
+    },
+    "mem0": {
+      "type": "local",
+      "command": [
+        "mem0-mcp-server"
+      ],
+      "environment": {
+        "MEM0_API_KEY": "{env:MEM0_API_KEY}"
+      },
+      "enabled": true
+    },
+    "ai-writers-workshop": {
+      "type": "local",
+      "command": [
+        "python3",
+        "~/.local/share/mcp-servers/ai_writers_workshop/mcp_server/server.py"
+      ],
+      "environment": {
+        "PYTHONPATH": "~/.local/share/mcp-servers/ai_writers_workshop"
+      },
+      "enabled": true
+    }
+  }
+}
