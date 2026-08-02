@@ -36,6 +36,9 @@ novels/
 │   ├── continuity-checker/SKILL.md    # Generic continuity checking procedure
 │   ├── prose-auditor/SKILL.md         # Generic prose style audit procedure
 │   ├── world-bible/SKILL.md           # Generic world-building reference procedure
+│   ├── story-memory/SKILL.md          # Graphiti knowledge graph interaction protocol
+│   ├── narrative-workshop/SKILL.md    # ai-writers-workshop reference lookups
+│   ├── chapter-review/SKILL.md        # Staged review pipeline orchestrator
 │   └── manuscript-processor/SKILL.md  # Automated manuscript processing pipeline
 ├── .novel-forge/                      # Framework support files
 │   ├── watcher.sh                     # File watcher daemon
@@ -151,8 +154,9 @@ When information conflicts, trust these sources in this order:
 2. **Master outlines** (structural intent — chapters not yet written follow these)
 3. **Lore documents** (world-building bibles in the series' `lore/` directory)
 4. **Canon files** (`canon/characters.md`, `canon/locks.yaml`, `canon/timeline.md` — derived from the above)
-5. **This AGENTS.md** (generic editorial rules)
-6. **AI Prompt.md** (prose style rules only — no story content)
+5. **Graphiti knowledge graph** (editorial decisions, verified facts, session continuity — see Knowledge Graph section)
+6. **This AGENTS.md** (generic editorial rules)
+7. **AI Prompt.md** (prose style rules only — no story content)
 
 If you find a conflict between sources, **flag it to the author** rather than resolving it yourself.
 
@@ -219,33 +223,37 @@ When a character appears in multiple books:
 
 Report findings by severity:
 
-### BLOCKER
+### 🚫 BLOCKER
 Canon lock violation, factual contradiction, or continuity break that MUST be fixed.
 ```
-BLOCKER [Chapter X, Line/Para ref]: Description of the violation.
+🚫 BLOCKER [Chapter X, Line/Para ref]: Description of the violation.
    Canon source: [which source contradicts this]
    Fix: [specific correction needed]
 ```
 
-### WARNING
+### ⚠️ WARNING
 Potential inconsistency or questionable reference that should be reviewed.
 ```
-WARNING [Chapter X, Line/Para ref]: Description of the concern.
+⚠️ WARNING [Chapter X, Line/Para ref]: Description of the concern.
    Context: [why this might be a problem]
    Suggestion: [proposed resolution]
 ```
 
-### NOTE
+### 📝 NOTE
 Minor observation, style note, or suggestion that doesn't affect continuity.
 ```
-NOTE [Chapter X, Line/Para ref]: Observation.
+📝 NOTE [Chapter X, Line/Para ref]: Observation.
 ```
 
 ---
 
-## Prerequisites
+## Knowledge Graph (Graphiti)
 
-The Graphiti knowledge graph MCP server requires FalkorDB to be running. Before starting a session, verify:
+The Graphiti knowledge graph is the **persistent editorial brain** for this repository. It stores decisions, verified facts, character constraints, chapter statuses, and continuity links across sessions. Without it, every new session starts from zero.
+
+### Prerequisites
+
+The Graphiti MCP server requires FalkorDB to be running. Before starting a session, verify:
 
 ```bash
 docker ps --filter name=falkordb
@@ -258,6 +266,87 @@ docker start falkordb
 ```
 
 FalkorDB should be accessible on `localhost:6379`. The Graphiti MCP server will not function without it.
+
+### Source of Truth Position
+
+Graphiti sits in the hierarchy as **persistent editorial memory** — it does NOT override file-based canon, but it captures decisions and context that files alone cannot (see the Source of Truth Hierarchy above, position 5).
+
+### Mandatory Session Protocol
+
+**Every session MUST begin with a Graphiti query.** Before reading files or reviewing chapters:
+
+1. **Query Graphiti for the series** you're working on:
+   - `search_nodes("series name")` — get project overview, chapter statuses
+   - `search_memory_facts("character constraints")` — get all active constraints
+   - `search_memory_facts("editorial decisions")` — get approved/rejected decisions
+   - `search_memory_facts("verified historical facts")` — get research outcomes
+2. **Use what you find** — don't re-discover things already established in prior sessions
+3. **Flag conflicts** — if Graphiti says one thing and a file says another, the file wins, but flag the Graphiti entry for update
+
+**Every editorial action MUST be stored in Graphiti.** After a chapter review, editorial decision, constraint change, verified fact, rejected prose option, identified prose-fix pattern, or discovered continuity link — store an `add_memory` episode.
+
+### Group ID Convention
+
+All episodes for a series use an underscore-delimited version of the series directory name as the `group_id`:
+
+> **⚠️ CRITICAL: FalkorDB's RediSearch breaks on hyphens in group_ids.** Always use underscores, never hyphens. A series directory named `my-series` becomes the group_id `my_series`.
+
+This keeps each series' knowledge graph cleanly separated.
+
+> **🚫 CRITICAL: `group_id` MUST be passed as its own tool parameter, never embedded in the episode body.** The MCP server is launched with a fallback default group_id; if you omit the `group_id` parameter, writes **silently fall back to the default** and become unretrievable via the series group_id. Always set it explicitly, then verify after writing with `get_episodes: group_ids=["<your_group_id>"]`.
+
+### What Graphiti Stores (vs. What Files Store)
+
+| Information Type | Stored In Files | Stored In Graphiti |
+|-----------------|-----------------|-------------------|
+| Character bios and traits | `canon/characters.md` | ✗ (read from file) |
+| Canon locks (names, ages) | `canon/locks.yaml` | ✗ (read from file) |
+| Timeline events | `canon/timeline.md` | ✗ (read from file) |
+| Manuscript prose | `manuscript/chapter-*.md` | ✗ (read from file) |
+| Editorial decisions | ✗ | ✓ (approved/rejected choices + reasoning) |
+| Chapter review status | ✗ | ✓ (e.g., "Chapter 3 FINAL — zero blockers") |
+| Verified historical facts | ✗ | ✓ (anachronisms caught, dates verified) |
+| Rejected prose options | ✗ | ✓ (which option, why, what was wrong) |
+| Recurring prose fix patterns | ✗ | ✓ (the recurring issue and standard fix) |
+| Cross-chapter continuity | ✗ | ✓ (locked cross-references) |
+| Constraint overrides | ✗ | ✓ (author overrides of outline language) |
+
+Load the `story-memory` skill for the full naming conventions, episode structure, and query patterns. **Load it at the start of every editorial session.**
+
+---
+
+## AI Writers Workshop (Reference Tool)
+
+The `ai-writers-workshop` MCP provides a library of **narrative patterns**, **character archetypes**, and **plotline structures** based on established literary and psychological frameworks. It is available as a **lookup/analysis tool only** — do NOT use it to create projects, generate scenes, or manage story state.
+
+### When to Use
+
+- **During chapter review**: Look up the narrative pattern a chapter follows to verify structural integrity
+- **During character analysis**: Check a character against archetype definitions to assess consistency
+- **During plotline evaluation**: Analyze whether plot points align with the intended plotline structure
+- **When discussing structure with the author**: Reference established patterns by name and stage
+
+### Available Lookups
+
+| Tool | Use For |
+|------|---------|
+| `list_patterns` / `get_pattern_details` | Narrative patterns (Hero's Journey, Transformation, Tragedy, etc.) |
+| `list_archetypes` / `get_archetype_details` | Character archetypes (Hero, Mentor, Shadow, Herald, Trickster, etc.) |
+| `list_plotlines` / `get_plotline_details` | Plotline types (Quest, Revenge, Man vs. Nature, Man vs. Self, etc.) |
+| `analyze_narrative` | Check a set of scenes against a pattern structure |
+| `analyze_plotline` | Check plot points against a plotline type |
+
+Each series should define its own pattern/archetype/plotline reference map in its series-level documentation (see the `narrative-workshop` skill's Reference Map Template).
+
+### What You Do NOT Do with This Tool
+
+- Create writing projects (`create_writing_project`) — manuscripts live in files
+- Generate scenes (`generate_scene`) or outlines (`generate_outline`) — that's the prose generator / master outline
+- Create characters (`create_character`) — characters live in `canon/characters.md`
+- Compile narratives (`compile_narrative`) — the manuscript lives in chapter files
+- Run agent scripts (`run_agent`)
+
+Load the `narrative-workshop` skill for structured, read-only interaction with this MCP.
 
 ---
 
@@ -283,7 +372,25 @@ When activated, the agent scans manuscript chapters for violations of the prose 
 ```
 When activated, the agent indexes the series' lore documents (referenced in `SERIES.yaml`), master outlines, and canon files to answer world-building questions: timeline accuracy, technology references, organization names, geographic details. It refuses to invent details not found in the source documents.
 
-### 4. `manuscript-processor` — Automated Manuscript Pipeline
+### 4. `story-memory` — Persistent Editorial Memory (Graphiti)
+```
+.opencode/skills/story-memory/SKILL.md
+```
+When activated, the agent follows a structured protocol for interacting with the Graphiti knowledge graph. It queries existing knowledge at session start, stores editorial decisions/facts/constraints after every review action, and uses consistent naming conventions (and the underscore `group_id` convention) so the graph remains searchable across sessions. **Load this skill at the start of every editorial session.**
+
+### 5. `narrative-workshop` — Narrative Pattern Reference (ai-writers-workshop)
+```
+.opencode/skills/narrative-workshop/SKILL.md
+```
+When activated, the agent uses the ai-writers-workshop MCP as a **read-only reference library** for narrative patterns, character archetypes, and plotline structures. It looks up pattern stages during chapter reviews, checks characters against archetype definitions, and analyzes plotline alignment. It never creates projects, generates scenes, or manages story state through the MCP.
+
+### 6. `chapter-review` — Staged Chapter Review Pipeline (Orchestrator)
+```
+.opencode/skills/chapter-review/SKILL.md
+```
+When activated, the agent becomes the review conductor that sequences the other skills across a chapter's drafting lifecycle. It runs three staged reviews — **Stage 1: synopsis continuity**, **Stage 2: scene continuity**, and **Stage 3: full prose review** (`prose-auditor` + `continuity-checker`). Its **Golden Rule**: the instant chapter prose is pasted into chat, the FIRST action is to write it to disk verbatim (with front matter, `status: draft`) so a durable original always exists before any review or edit. It orchestrates `continuity-checker`, `prose-auditor`, and `story-memory` rather than replacing them.
+
+### 7. `manuscript-processor` — Automated Manuscript Pipeline
 ```
 .opencode/skills/manuscript-processor/SKILL.md
 ```

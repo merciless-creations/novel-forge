@@ -11,10 +11,16 @@ output/
 .DS_Store
 Thumbs.db
 
+# Windows "Mark of the Web" alternate data stream files
+*:Zone.Identifier
+
 # Editor files
 *.swp
 *.swo
 *~
+
+# Backup files
+*.bak
 
 # Node modules (if any tools use them)
 node_modules/
