@@ -81,9 +81,19 @@ Drop your chapters in a folder. The forge does the rest.
 You need **two things** before setup:
 
 1. **[OpenCode](https://opencode.ai)** — the AI runtime
-2. **[OpenAI API key](https://platform.openai.com/api-keys)** — powers the AI brain
+2. **[OpenAI API key](https://platform.openai.com/api-keys)** — powers the knowledge-graph memory
 
-Optional: **[Mem0 API key](https://app.mem0.ai/dashboard/api-keys)** — gives the AI long-term memory
+Optional: **[Mem0 API key](https://app.mem0.ai/dashboard/api-keys)** — gives the AI long-term memory (has a free tier)
+
+> #### 💳 About the OpenAI key — it must be a *paid* (billing-enabled) key, but it costs pennies
+>
+> A **free ChatGPT account is not enough.** The OpenAI *API* is separate from the ChatGPT website and is pay-as-you-go — you must add a payment method or prepay credits at [platform.openai.com/billing](https://platform.openai.com/account/billing). Without billing enabled, the key returns `insufficient_quota` and the knowledge graph silently fails to save.
+>
+> **What it's used for:** *only* the Graphiti knowledge-graph memory (entity extraction + embeddings). It does **not** generate your prose. It runs the cheapest OpenAI models (`gpt-4o-mini` + `text-embedding-3-small`).
+>
+> **What it costs:** fractions of a cent per editorial session — realistically **well under $1/month**. A one-time **$5 prepaid credit lasts months.**
+>
+> **Don't want to pay OpenAI at all?** You can skip this key — everything works *except* cross-session memory (the `story-memory` skill). Continuity checks, prose auditing, DOCX processing, and structure checks all run without it. (Advanced: Graphiti can also be pointed at a local model like Ollama to avoid OpenAI entirely.)
 
 ### Install
 
@@ -339,6 +349,18 @@ The knowledge graph database needs Docker:
 ```bash
 docker start falkordb
 ```
+</details>
+
+<details>
+<summary><strong>"insufficient_quota" / knowledge graph not saving</strong></summary>
+
+Your OpenAI key has no billing/credits. A **free ChatGPT account does not include API access** — the API is pay-as-you-go and separate.
+
+1. Add a payment method or prepay credits at [platform.openai.com/billing](https://platform.openai.com/account/billing) (a one-time $5 lasts months).
+2. Confirm the key is set: `echo $OPENAI_API_KEY` (should start with `sk-`).
+3. Restart the OpenCode service so it picks up the key.
+
+The graph uses only the cheapest models (`gpt-4o-mini` + `text-embedding-3-small`), so cost is fractions of a cent per session. Everything else in the forge works without this key — you only lose cross-session memory.
 </details>
 
 <details>
